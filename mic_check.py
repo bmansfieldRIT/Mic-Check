@@ -10,7 +10,7 @@ def formatLyrics(lyricsObj):
 
 	# deals with characters that charmap can't handle
 	lyrics = lyricsObj.get_text().replace(u"\u2019", "").replace(u"\u201c", "").replace(u"\u201d", "").replace(u"\u2018", "").replace("\n", " ").replace("\r", " ")
-	lyrics = lyrics.replace("!", "").replace("[", "").replace("]", "").replace("(", "").replace(")", "").replace(".", "").replace("\'", "").replace("\"", "").replace(",", "")
+	lyrics.replace("!", "").replace("[", "").replace("]", "").replace("(", "").replace(")", "").replace(".", "").replace("\'", "").replace("\"", "").replace(",", "")
 	return lyrics
 
 def createLyricDict():
@@ -33,14 +33,15 @@ def main():
 		print "usage: python mic_check.py 'artist_name' 'num_words_to_show'"
 		exit(1)
 	else:
-		artistName = sys.argv[1]
+		artist_name = sys.argv[1]
 		num_words_to_show = sys.argv[2]
 
-	formattedArtistName = artist_name.replace(" ", "-")
-	formattedRequestURL = "https://www.songlyrics.com/" + formattedArtistName + "-lyrics/"
+	print artist_name
+	artist_name = artist_name.replace(" ", "-")
+	print artist_name
+	formattedRequestURL = "https://www.songlyrics.com/" + artist_name + "-lyrics/"
 
-	# example artist
-	page = requests.get("https://www.songlyrics.com/kendrick-lamar-lyrics/").content
+	page = requests.get(formattedRequestURL).content
 	artistPage = BeautifulSoup(page, "html.parser")
 	trackList = artistPage.find("table", {"class" : "tracklist"})
 
