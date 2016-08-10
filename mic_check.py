@@ -3,6 +3,7 @@
 
 import sys
 import requests
+import click # used to show a progress bar for requests
 from collections import Counter
 from bs4 import BeautifulSoup
 
@@ -106,14 +107,16 @@ def main():
 	lyricDict = createLyricDict()
 	songPages = []
 
-	for song in trackList.findAll("a"):
-		songPage = requests.get(song.get('href')).content
-		songPageSoup = BeautifulSoup(songPage, "html.parser")
+	trackLinkList = trackList.findAll("a")
+	with click.progressbar(trackLinkList) as bar:
+		for song in bar:
+			songPage = requests.get(song.get('href')).content
+			songPageSoup = BeautifulSoup(songPage, "html.parser")
 
-		lyricsContainer = songPageSoup.find("p", {"id" : "songLyricsDiv"})
-		# img_tags = lyricsContainer.img.extract()
-		lyrics = formatLyrics(lyricsContainer)
-		songPages.append(lyrics)
+			lyricsContainer = songPageSoup.find("p", {"id" : "songLyricsDiv"})
+			# img_tags = lyricsContainer.img.extract()
+			lyrics = formatLyrics(lyricsContainer)
+			songPages.append(lyrics)
 
 	print "Parsing lyrics..."
 	for songPage in songPages:
