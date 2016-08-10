@@ -2,6 +2,7 @@
 # usage: python mic_check.py artist_name num_words_to_show
 
 import sys
+from collections import Counter
 import requests
 from bs4 import BeautifulSoup
 
@@ -63,9 +64,10 @@ def addSongToLyricDict(lyrics, lyricDict, artistName):
 					else:
 						lyricDict[lyric] = lyricDict[lyric] + 1
 
-def printLyricDict(lyricDict, reverseBool):
-	for word in sorted(lyricDict, key=lyricDict.get, reverse=reverseBool):
-	  	print word, lyricDict[word]
+def printLyricDict(lyricDict, reverseBool, numWords):
+	counterDict = Counter(lyricDict)
+	for k, v in counterDict.most_common(numWords):
+		print '%s: %i' % (k, v)
 
 def main():
 
@@ -84,7 +86,7 @@ def main():
 	artistPage = BeautifulSoup(page, "html.parser")
 
 	print "Retreiving " + artistPage.title.get_text().title() + "..."
-	print "Not the artist you were the looking for? Check spelling and generally remove all punctuation"
+	print "** Not the artist you were the looking for? Check spelling and generally remove all punctuation **"
 	trackList = artistPage.find("table", {"class" : "tracklist"})
 
 	lyricDict = createLyricDict()
@@ -101,22 +103,30 @@ def main():
 
 	print "Parsing lyrics..."
 	for songPage in songPages:
-		addSongToLyricDict(songPage, lyricDict, artist_name)
+		addSongToLyricDict(songPage, lyricDict, artistName)
 
 	done = False
 	while not done:
 		prompt = """\nChoose an option:
 		1: Print Full Lyric Dictionary (Most Used First)
 		2: Print Full Lyric Dictionary (Least Used First)
-		3: Exit \n"""
+		3: Print n lyrics (Most Used)
+		4: Print n Lyrics (Least Used)
+		99: Exit \n"""
 
 		loopInput = input(prompt)
 
 		if loopInput == 1:
-			printLyricDict(lyricDict, True)
+			printLyricDict(lyricDict, True, len(lyricDict))
 		elif loopInput == 2:
-			printLyricDict(lyricDict, False)
+			printLyricDict(lyricDict, False, len(lyricDict))
 		elif loopInput == 3:
+			numLyricsInput = input("Number of Lyrics to Print: ")
+			printLyricDict(lyricDict, True, numLyricsInput)
+		elif loopInput == 4:
+			numLyricsInput = input("Number of Lyrics to Print: ")
+			printLyricDict(lyricDict, False, numLyricsInput)
+		elif loopInput == 99:
 			exit(1)
 
 main()
