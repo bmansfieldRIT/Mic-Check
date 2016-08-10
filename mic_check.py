@@ -11,7 +11,7 @@ def formatLyrics(lyricsObj):
 
 	# deals with characters that charmap can't handle
 	lyrics = lyricsObj.get_text().replace(u"\u2019", "").replace(u"\u201c", "").replace(u"\u201d", "").replace(u"\u2018", "").replace("\n", " ").replace("\r", " ")
-	# lyrics.replace("!", "").replace("[", "").replace("]", "").replace("(", "").replace(")", "").replace(".", "").replace("\'", "").replace("\"", "").replace(",", "")
+	lyrics = lyrics.replace("!", "").replace(",", "")
 	return lyrics
 
 # returns an empty dictionary
@@ -46,28 +46,42 @@ def addSongToLyricDict(lyrics, lyricDict, artistName):
 		lyric = lyric.lower()
 
 		# test if we are at the beginning of a tag
-		if len(lyric) > 0 and lyric[0] == "[":
-			tagInfo += lyric
-			if lyric[-1] != "]": # test if we are at the end of a tag
-				collectingTagInfo = True # set flag to begin collecting tag information
-		else:
-			if collectingTagInfo:
-				# test if we are at the end of a tag
-				if len(lyric) > 0 and lyric[-1] == "]":
-					collectingTagInfo = False
-					checkTagAgainstArtist = True
-				tagInfo += " " + lyric
+		if len(lyric) > 0:
+			if lyric[0] == "[":
+				tagInfo += lyric
+				if lyric[-1] != "]": # test if we are at the end of a tag
+					collectingTagInfo = True # set flag to begin collecting tag information
 			else:
-				if acceptLyrics:
-					if lyric not in lyricDict:
-						lyricDict[lyric] = 1
-					else:
-						lyricDict[lyric] = lyricDict[lyric] + 1
+				if collectingTagInfo:
+					# test if we are at the end of a tag
+					if len(lyric) > 0 and lyric[-1] == "]":
+						collectingTagInfo = False
+						checkTagAgainstArtist = True
+					tagInfo += " " + lyric
+				else:
+					if acceptLyrics:
+						if lyric not in lyricDict:
+							lyricDict[lyric] = 1
+						else:
+							lyricDict[lyric] += 1
 
-def printLyricDict(lyricDict, reverseBool, numWords):
+def removeDuplicateEntries(lyricDict):
+	lyricsMarkedForDeletion = [] # lyrics cannot be deleted in the for loop marking them as duplicates, so we delete them afterwards
+	for lyric in lyricDict:
+		if (lyric[-1] == "s" and lyric[:len(lyric) - 1] in lyricDict):
+			lyricDict[lyric[:len(lyric) - 1]] += lyricDict[lyric]
+			lyricsMarkedForDeletion.append(lyric)
+	for markedLyric in lyricsMarkedForDeletion:
+		del lyricDict[markedLyric]
+
+def printLyricDict(lyricDict, leastCommonBool, numWords):
 	counterDict = Counter(lyricDict)
-	for k, v in counterDict.most_common(numWords):
-		print '%s: %i' % (k, v)
+	if not leastCommonBool:
+		for k, v in counterDict.most_common(numWords):
+			print '%s: %i' % (k, v)
+	else:
+		for k, v in counterDict.most_common(len(counterDict))[:-(numWords+1):-1]:
+			print '%s: %i' % (k, v)
 
 def main():
 
@@ -105,6 +119,9 @@ def main():
 	for songPage in songPages:
 		addSongToLyricDict(songPage, lyricDict, artistName)
 
+	print "Organizing Lyric Dictionary..."
+	removeDuplicateEntries(lyricDict)
+
 	done = False
 	while not done:
 		prompt = """\nChoose an option:
@@ -112,21 +129,27 @@ def main():
 		2: Print Full Lyric Dictionary (Least Used First)
 		3: Print n lyrics (Most Used)
 		4: Print n Lyrics (Least Used)
+		5: Search For Word
 		99: Exit \n"""
 
-		loopInput = input(prompt)
+		loopInput = raw_input(prompt)
 
-		if loopInput == 1:
+		if loopInput == "1":
 			printLyricDict(lyricDict, True, len(lyricDict))
-		elif loopInput == 2:
+		elif loopInput == "2":
 			printLyricDict(lyricDict, False, len(lyricDict))
-		elif loopInput == 3:
-			numLyricsInput = input("Number of Lyrics to Print: ")
-			printLyricDict(lyricDict, True, numLyricsInput)
-		elif loopInput == 4:
-			numLyricsInput = input("Number of Lyrics to Print: ")
+		elif loopInput == "3":
+			numLyricsInput = int(raw_input("Number of Lyrics to Print: "))
 			printLyricDict(lyricDict, False, numLyricsInput)
-		elif loopInput == 99:
+		elif loopInput == "4":
+			numLyricsInput = int(raw_input("Number of Lyrics to Print: "))
+			printLyricDict(lyricDict, True, numLyricsInput)
+		elif loopInput == "5":
+			searchTermInput = raw_input("Word to Search For: ")
+			print "Number of Times Word Used: %i" % lyricDict[searchTermInput]
+		elif loopInput == "99":
 			exit(1)
+		else:
+			print "Incorrect Input"
 
 main()
