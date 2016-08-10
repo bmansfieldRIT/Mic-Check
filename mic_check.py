@@ -75,10 +75,10 @@ def main():
 		print "usage: python mic_check.py 'artist_name'"
 		exit(1)
 	else:
-		artist_name = sys.argv[1]
+		artistName = sys.argv[1]
 
-	fmt_artist_name = artist_name.replace(" ", "-")
-	formattedRequestURL = "https://www.songlyrics.com/" + fmt_artist_name + "-lyrics/"
+	fmtArtistName = artistName.replace(" ", "-")
+	formattedRequestURL = "https://www.songlyrics.com/" + fmtArtistName + "-lyrics/"
 
 	page = requests.get(formattedRequestURL).content
 	artistPage = BeautifulSoup(page, "html.parser")
