@@ -53,11 +53,9 @@ def addSongToLyricDict(lyrics, lyricDict, artistName):
 			if collectingTagInfo:
 				# test if we are at the end of a tag
 				if len(lyric) > 0 and lyric[-1] == "]":
-					tagInfo += " " + lyric
 					collectingTagInfo = False
 					checkTagAgainstArtist = True
-				else:
-					tagInfo += " " + lyric
+				tagInfo += " " + lyric
 			else:
 				if acceptLyrics:
 					if lyric not in lyricDict:
@@ -67,16 +65,13 @@ def addSongToLyricDict(lyrics, lyricDict, artistName):
 
 def main():
 
-	artist_name = ""
-	num_words_to_show = ""
-	num_lyrics_order = ""
+	artistName = ""
 
-	if (len(sys.argv) <  3):
-		print "usage: python mic_check.py 'artist_name' num_words_to_show"
+	if (len(sys.argv) < 2):
+		print "usage: python mic_check.py 'artist_name'"
 		exit(1)
 	else:
 		artist_name = sys.argv[1]
-		num_words_to_show = sys.argv[2]
 
 	fmt_artist_name = artist_name.replace(" ", "-")
 	formattedRequestURL = "https://www.songlyrics.com/" + fmt_artist_name + "-lyrics/"
