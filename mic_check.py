@@ -2,8 +2,8 @@
 # usage: python mic_check.py artist_name num_words_to_show
 
 import sys
-from collections import Counter
 import requests
+from collections import Counter
 from bs4 import BeautifulSoup
 
 # removes characters from a set of lyrics before parsing
@@ -86,7 +86,7 @@ def main():
 	artistPage = BeautifulSoup(page, "html.parser")
 
 	print "Retreiving " + artistPage.title.get_text().title() + "..."
-	print "** Not the artist you were the looking for? Check spelling and generally remove all punctuation **"
+	print "** Not the artist you were looking for? Check spelling and generally remove all punctuation **"
 	trackList = artistPage.find("table", {"class" : "tracklist"})
 
 	lyricDict = createLyricDict()
