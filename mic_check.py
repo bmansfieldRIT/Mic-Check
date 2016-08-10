@@ -18,11 +18,11 @@ def createLyricDict():
 	return {}
 
 # note: lyrics sometimes contain tags such as [verse 1: Brian Eno]
-# 		to indicate who the lyrics belong to. In this case, the function will
-# 		only add blocks of lyrics after a tag contains the given artists name.
-#		Otherwise, the songs will have tags such as [verse 2], or no tags at all.
-#		By default, this function will assume all lyrics in a song belong to
-#		the given artist.
+# 	to indicate who the lyrics belong to. In this case, the function will
+# 	only add blocks of lyrics after a tag contains the given artists name.
+#	Otherwise, the songs will have tags such as [verse 2], or no tags at all.
+#	By default, this function will assume all lyrics in a song belong to
+#	the given artist.
 def addSongToLyricDict(lyrics, lyricDict, artistName):
 
 	acceptLyrics = True # indicate whether to count these lyrics as the given singer's
@@ -63,6 +63,10 @@ def addSongToLyricDict(lyrics, lyricDict, artistName):
 					else:
 						lyricDict[lyric] = lyricDict[lyric] + 1
 
+def printLyricDict(lyricDict, reverseBool):
+	for word in sorted(lyricDict, key=lyricDict.get, reverse=reverseBool):
+	  	print word, lyricDict[word]
+
 def main():
 
 	artistName = ""
@@ -80,6 +84,7 @@ def main():
 	artistPage = BeautifulSoup(page, "html.parser")
 
 	print "Retreiving " + artistPage.title.get_text().title() + "..."
+	print "Not the artist you were the looking for? Check spelling and generally remove all punctuation"
 	trackList = artistPage.find("table", {"class" : "tracklist"})
 
 	lyricDict = createLyricDict()
@@ -98,8 +103,20 @@ def main():
 	for songPage in songPages:
 		addSongToLyricDict(songPage, lyricDict, artist_name)
 
-	# for word in sorted(lyricDict, key=lyricDict.get, reverse=True):
-  	#	print word, lyricDict[word]
-	# print lyricDict
+	done = False
+	while not done:
+		prompt = """\nChoose an option:
+		1: Print Full Lyric Dictionary (Most Used First)
+		2: Print Full Lyric Dictionary (Least Used First)
+		3: Exit \n"""
+
+		loopInput = input(prompt)
+
+		if loopInput == 1:
+			printLyricDict(lyricDict, True)
+		elif loopInput == 2:
+			printLyricDict(lyricDict, False)
+		elif loopInput == 3:
+			exit(1)
 
 main()
