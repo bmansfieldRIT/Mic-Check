@@ -1,11 +1,11 @@
 # mic_check.py
 # usage: python mic_check.py artist_name num_words_to_show
-# flags: -most (show most used words), -least (show least words used)
 
 import sys
 import requests
 from bs4 import BeautifulSoup
 
+# removes characters from a set of lyrics before parsing
 def formatLyrics(lyricsObj):
 
 	# deals with characters that charmap can't handle
@@ -13,38 +13,49 @@ def formatLyrics(lyricsObj):
 	# lyrics.replace("!", "").replace("[", "").replace("]", "").replace("(", "").replace(")", "").replace(".", "").replace("\'", "").replace("\"", "").replace(",", "")
 	return lyrics
 
+# returns an empty dictionary
 def createLyricDict():
 	return {}
 
+# note: lyrics sometimes contain tags such as [verse 1: Brian Eno]
+# 		to indicate who the lyrics belong to. In this case, the function will
+# 		only add blocks of lyrics after a tag contains the given artists name.
+#		Otherwise, the songs will have tags such as [verse 2], or no tags at all.
+#		By default, this function will assume all lyrics in a song belong to
+#		the given artist.
 def addSongToLyricDict(lyrics, lyricDict, artistName):
+
 	acceptLyrics = True # indicate whether to count these lyrics as the given singer's
 	collectingTagInfo = False
 	checkTagAgainstArtist = False
-	tagInfo = "" # construct a string determining the singer of a block of lyrics ex. [verse 1: A Singer]
+
+	tagInfo = "" # construct a string representing the tag of a lyric block
+
 	for lyric in lyrics.split(" "):
 
+		# check if the next block of lyrics belongs to the given artist
 		if checkTagAgainstArtist:
-			if artistName in tagInfo or ":" not in tagInfo:
+			if artistName in tagInfo or ":" not in tagInfo: # if the tag does not contain a colon, assume it is the given artists
 				acceptLyrics = True
-				tagInfo = ""
+				tagInfo = "" # reset the tag string
 			else:
 				acceptLyrics = False
 			checkTagAgainstArtist = False
 
-
 		lyric = lyric.lower()
+
+		# test if we are at the beginning of a tag
 		if len(lyric) > 0 and lyric[0] == "[":
 			tagInfo += lyric
-			if lyric[-1] != "]":
-				collectingTagInfo = True
-
+			if lyric[-1] != "]": # test if we are at the end of a tag
+				collectingTagInfo = True # set flag to begin collecting tag information
 		else:
 			if collectingTagInfo:
+				# test if we are at the end of a tag
 				if len(lyric) > 0 and lyric[-1] == "]":
 					tagInfo += " " + lyric
 					collectingTagInfo = False
 					checkTagAgainstArtist = True
-					print tagInfo
 				else:
 					tagInfo += " " + lyric
 			else:
@@ -91,7 +102,6 @@ def main():
 	print "Parsing lyrics..."
 	for songPage in songPages:
 		addSongToLyricDict(songPage, lyricDict, artist_name)
-
 
 	# for word in sorted(lyricDict, key=lyricDict.get, reverse=True):
   	#	print word, lyricDict[word]
