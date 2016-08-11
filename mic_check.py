@@ -149,7 +149,10 @@ def main():
 			printLyricDict(lyricDict, True, numLyricsInput)
 		elif loopInput == "5":
 			searchTermInput = raw_input("Word to Search For: ")
-			print "Number of Times Word Used: %i" % lyricDict[searchTermInput]
+			if searchTermInput not in lyricDict:
+				print "Number of Times Word Used: %i" % 0
+			else:
+				print "Number of Times Word Used: %i" % lyricDict[searchTermInput]
 		elif loopInput == "99":
 			exit(1)
 		else:
