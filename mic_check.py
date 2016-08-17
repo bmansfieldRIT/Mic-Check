@@ -12,7 +12,8 @@ def formatLyrics(lyricsObj):
 
 	# deals with characters that charmap can't handle
 	lyrics = lyricsObj.get_text().replace(u"\u2019", "").replace(u"\u201c", "").replace(u"\u201d", "").replace(u"\u2018", "").replace("\n", " ").replace("\r", " ")
-	lyrics = lyrics.replace("!", "").replace(",", "")
+	lyrics = lyrics.replace("!", "").replace(",", "").replace(")", "").replace("(", "").replace("\"", "").replace("-", " ").replace("?", "").replace(".", "")
+	lyrics = lyrics.replace('*', "")
 	return lyrics
 
 # returns an empty dictionary
@@ -67,7 +68,7 @@ def addSongToLyricDict(lyrics, lyricDict, artistName):
 							lyricDict[lyric] += 1
 
 def removeDuplicateEntries(lyricDict):
-	lyricsMarkedForDeletion = [] # lyrics cannot be deleted in the for loop marking them as duplicates, so we delete them afterwards
+	lyricsMarkedForDeletion = [] # lyrics cannot be deleted in the for loop, so we delete them afterwards
 	for lyric in lyricDict:
 		if (lyric[-1] == "s" and lyric[:len(lyric) - 1] in lyricDict):
 			lyricDict[lyric[:len(lyric) - 1]] += lyricDict[lyric]
@@ -83,6 +84,15 @@ def printLyricDict(lyricDict, leastCommonBool, numWords):
 	else:
 		for k, v in counterDict.most_common(len(counterDict))[:-(numWords+1):-1]:
 			print '%s: %i' % (k, v)
+
+def printLyricStatistics(lyricDict, numSongs):
+	totalNumWords = sum(lyricDict.values())
+	uniqueWords = len(lyricDict)
+	
+	print "Total Number of Words Used: " + str(totalNumWords)
+	print "Number of Unique Words Used: " + str(uniqueWords)
+	print "Average Words Per Song: " + str(totalNumWords / numSongs)
+	print "Average Unique Words Per Song: " + str(uniqueWords / numSongs)
 
 def main():
 
@@ -133,6 +143,7 @@ def main():
 		3: Print n lyrics (Most Used)
 		4: Print n Lyrics (Least Used)
 		5: Search For Word
+		6: Print Statistics
 		99: Exit \n"""
 
 		loopInput = raw_input(prompt)
@@ -153,6 +164,8 @@ def main():
 				print "Number of Times Word Used: %i" % 0
 			else:
 				print "Number of Times Word Used: %i" % lyricDict[searchTermInput]
+		elif loopInput == "6":
+			printLyricStatistics(lyricDict, len(songPages))
 		elif loopInput == "99":
 			exit(1)
 		else:
