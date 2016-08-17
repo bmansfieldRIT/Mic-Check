@@ -88,7 +88,7 @@ def printLyricDict(lyricDict, leastCommonBool, numWords):
 def printLyricStatistics(lyricDict, numSongs):
 	totalNumWords = sum(lyricDict.values())
 	uniqueWords = len(lyricDict)
-	
+
 	print "Total Number of Words Used: " + str(totalNumWords)
 	print "Number of Unique Words Used: " + str(uniqueWords)
 	print "Average Words Per Song: " + str(totalNumWords / numSongs)
@@ -144,6 +144,7 @@ def main():
 		4: Print n Lyrics (Least Used)
 		5: Search For Word
 		6: Print Statistics
+		7: Write Lyrics to File
 		99: Exit \n"""
 
 		loopInput = raw_input(prompt)
@@ -166,6 +167,12 @@ def main():
 				print "Number of Times Word Used: %i" % lyricDict[searchTermInput]
 		elif loopInput == "6":
 			printLyricStatistics(lyricDict, len(songPages))
+		elif loopInput == "7":
+			filename = raw_input("Name of File: ")
+			outputFile = open(filename + ".txt", "w")
+			print "Writing Lyrics to File..."
+			for key, value in sorted(lyricDict.iteritems()):
+				outputFile.write(key.encode('utf-8') + ": " + str(value) + "\n")
 		elif loopInput == "99":
 			exit(1)
 		else:
