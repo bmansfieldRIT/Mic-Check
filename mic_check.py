@@ -7,6 +7,8 @@ import click # used to show a progress bar for requests
 from collections import Counter
 from bs4 import BeautifulSoup
 
+
+
 # removes characters from a set of lyrics before parsing
 def formatLyrics(lyricsObj):
 
@@ -16,9 +18,17 @@ def formatLyrics(lyricsObj):
 	lyrics = lyrics.replace('*', "")
 	return lyrics
 
+
+
 # returns an empty dictionary
 def createLyricDict():
 	return {}
+
+
+# creates a dictionary to replace common shortenings and misspellings with a proper word
+def createMisspellingsDict():
+    return dict([("'bout","about"), ("'cause","because"), ("'em","them")])
+
 
 # note: lyrics sometimes contain tags such as [verse 1: Brian Eno]
 # 	to indicate who the lyrics belong to. In this case, the function will
@@ -31,6 +41,7 @@ def addSongToLyricDict(lyrics, lyricDict, artistName):
 	acceptLyrics = True # indicate whether to count these lyrics as the given singer's
 	collectingTagInfo = False
 	checkTagAgainstArtist = False
+	replacewordsDict = createMisspellingsDict()
 
 	tagInfo = "" # construct a string representing the tag of a lyric block
 
@@ -62,10 +73,16 @@ def addSongToLyricDict(lyrics, lyricDict, artistName):
 					tagInfo += " " + lyric
 				else:
 					if acceptLyrics:
-						if lyric not in lyricDict:
-							lyricDict[lyric] = 1
+						if lyric in replacewordsDict:
+							if replacewordsDict[lyric] not in lyricDict:
+								lyricDict[replacewordsDict[lyric]] = 1
+							else:
+								lyricDict[replacewordsDict[lyric]] += 1
 						else:
-							lyricDict[lyric] += 1
+							if lyric not in lyricDict:
+								lyricDict[lyric] = 1
+							else:
+								lyricDict[lyric] += 1
 
 def removeDuplicateEntries(lyricDict):
 	lyricsMarkedForDeletion = [] # lyrics cannot be deleted in the for loop, so we delete them afterwards
@@ -76,6 +93,8 @@ def removeDuplicateEntries(lyricDict):
 	for markedLyric in lyricsMarkedForDeletion:
 		del lyricDict[markedLyric]
 
+
+
 def printLyricDict(lyricDict, leastCommonBool, numWords):
 	counterDict = Counter(lyricDict)
 	if not leastCommonBool:
@@ -85,6 +104,8 @@ def printLyricDict(lyricDict, leastCommonBool, numWords):
 		for k, v in counterDict.most_common(len(counterDict))[:-(numWords+1):-1]:
 			print '%s: %i' % (k, v)
 
+
+
 def printLyricStatistics(lyricDict, numSongs):
 	totalNumWords = sum(lyricDict.values())
 	uniqueWords = len(lyricDict)
@@ -93,6 +114,8 @@ def printLyricStatistics(lyricDict, numSongs):
 	print "Number of Unique Words Used: " + str(uniqueWords)
 	print "Average Words Per Song: " + str(totalNumWords / numSongs)
 	print "Average Unique Words Per Song: " + str(uniqueWords / numSongs)
+
+
 
 def main():
 

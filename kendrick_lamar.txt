@@ -9,12 +9,9 @@ $1099: 1
 '95: 2
 '97: 2
 'bang': 2
-'bout: 62
-'cause: 18
 'cross: 8
 'cuz: 4
 'eey: 2
-'em: 178
 'ey: 2
 'fore: 4
 'front: 1
@@ -197,7 +194,7 @@ aboard: 1
 abomination: 3
 abort: 1
 abortion: 3
-about: 279
+about: 341
 above: 6
 abraham: 1
 absent: 1
@@ -780,7 +777,7 @@ beaucoup: 2
 beautiful: 14
 beauty: 8
 became: 9
-because: 88
+because: 106
 become: 12
 becoming: 1
 becouse: 2
@@ -7563,7 +7560,7 @@ the: 5434
 thee: 6
 theft: 1
 their: 61
-them: 268
+them: 446
 themself: 1
 themselves: 2
 then: 553
