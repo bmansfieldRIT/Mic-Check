@@ -29,12 +29,6 @@ def formatLyricData(unfmtLyrics, fmtLyrics):
 	return fmtLyrics
 
 
-
-# returns an empty dictionary
-def createLyricDict():
-	return {}
-
-
 # creates a dictionary to replace common shortenings and misspellings with a proper word
 def createMisspellingsDict():
     return dict([("'bout","about"), ("'cause","because"), ("'em","them")])
@@ -150,7 +144,7 @@ def main():
 	print "** Not the artist you were looking for? Check spelling and generally remove all punctuation **"
 	trackList = artistPage.find("table", {"class" : "tracklist"})
 
-	lyricDict = createLyricDict()
+	lyricDict = {}
 	songPages = []
 
 	trackLinkList = trackList.findAll("a")
