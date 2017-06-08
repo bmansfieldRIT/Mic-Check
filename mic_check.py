@@ -29,23 +29,39 @@ def formatLyricData(unfmtLyrics, fmtLyrics):
 	return fmtLyrics
 
 
-# creates a dictionary to replace common shortenings and misspellings with a proper word
-def getMisspellingsDict():
-    return {"'bout":"about", "'cause":"because", "'em":"them"}
+# creates a dictionary to replace common prefix shortenings
+def getPrefixShorteningReplacements():
+    return { "'cross":"across", "'cause":"because", "'cuz":"because" }
+
+
+# creates a dictionary to replace common suffix shortenings
+def getSuffixShorteningReplacements():
+    return { "abusin'":"abusing", "actin'":"acting", "addin'":"adding" }
+
+
+# creates a dictionary to replace common misspellings
+def getMisspellingsReplacements():
+    return { "basterd'":"bastard", "beatz'":"beats", "becouse'":"because" }
+
+
+# creates a dictionary to replace common hyphenation errors
+def getHyphenationsReplacements():
+    return { "bar-code":"barcode", "break-fast":"breakfast", "car-pooling":"carpooling" }
 
 
 # note: lyrics sometimes contain tags such as [verse 1: Brian Eno]
 # 	to indicate who the lyrics belong to. In this case, the function will
 # 	only add blocks of lyrics after a tag contains the given artists name.
 #	Otherwise, the songs will have tags such as [verse 2], or no tags at all.
-#	By default, this function will assume all lyrics in a song belong to
-#	the given artist.
+#	By default, all lyrics are assumed to be the given artists until
+#   determined otherwise
 def addSongToLyricDict(lyrics, lyricDict, artistName):
 
 	acceptLyrics = True # indicate whether to count these lyrics as the given singer's
 	collectingTagInfo = False
 	checkTagAgainstArtist = False
-	replacewordsDict = getMisspellingsDict()
+
+	replacewordsDict = getPrefixShorteningReplacements()
 
 	tagInfo = "" # construct a string representing the tag of a lyric block
 
