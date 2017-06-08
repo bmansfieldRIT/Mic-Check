@@ -30,8 +30,8 @@ def formatLyricData(unfmtLyrics, fmtLyrics):
 
 
 # creates a dictionary to replace common shortenings and misspellings with a proper word
-def createMisspellingsDict():
-    return dict([("'bout","about"), ("'cause","because"), ("'em","them")])
+def getMisspellingsDict():
+    return {"'bout":"about", "'cause":"because", "'em":"them"}
 
 
 # note: lyrics sometimes contain tags such as [verse 1: Brian Eno]
@@ -45,7 +45,7 @@ def addSongToLyricDict(lyrics, lyricDict, artistName):
 	acceptLyrics = True # indicate whether to count these lyrics as the given singer's
 	collectingTagInfo = False
 	checkTagAgainstArtist = False
-	replacewordsDict = createMisspellingsDict()
+	replacewordsDict = getMisspellingsDict()
 
 	tagInfo = "" # construct a string representing the tag of a lyric block
 
