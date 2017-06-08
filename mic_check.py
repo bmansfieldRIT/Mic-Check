@@ -10,13 +10,23 @@ from bs4 import BeautifulSoup
 
 
 # removes characters from a set of lyrics before parsing
-def formatLyrics(lyricsObj):
+# Input: BeautifulSoup <p> object array
+# Output: String Array
+def formatLyricData(unfmtLyrics, fmtLyrics):
 
-	# deals with characters that charmap can't handle
-	lyrics = lyricsObj.get_text().replace(u"\u2019", "").replace(u"\u201c", "").replace(u"\u201d", "").replace(u"\u2018", "").replace("\n", " ").replace("\r", " ")
-	lyrics = lyrics.replace("!", "").replace(",", "").replace(")", "").replace("(", "").replace("\"", "").replace("-", " ").replace("?", "").replace(".", "")
-	lyrics = lyrics.replace('*', "")
-	return lyrics
+	for lyric in unfmtLyrics:
+
+		# convert BeautifulSoup object to a string
+		l = lyric.get_text()
+
+		# deal with characters that the charmap can't handle
+		l = l.replace(u"\u2019", "").replace(u"\u201c", "").replace(u"\u201d", "").replace(u"\u2018", "")
+		l = l.replace("\n", " ").replace("\r", " ").replace("\t", " ")
+		l = l.replace("!", "").replace(",", "").replace(")", "").replace("(", "").replace(";", "").replace("*", "").replace("?", "").replace(".", "").replace("\"", "")
+
+		fmtLyrics.append(l)
+
+	return fmtLyrics
 
 
 
@@ -119,6 +129,9 @@ def printLyricStatistics(lyricDict, numSongs):
 
 def main():
 
+	#
+	# retrieve artist lyric data
+	#
 	artistName = ""
 
 	if (len(sys.argv) < 2):
@@ -147,17 +160,27 @@ def main():
 			songPageSoup = BeautifulSoup(songPage, "html.parser")
 
 			lyricsContainer = songPageSoup.find("p", {"id" : "songLyricsDiv"})
-			# img_tags = lyricsContainer.img.extract()
-			lyrics = formatLyrics(lyricsContainer)
-			songPages.append(lyrics)
+			songPages.append(lyricsContainer)
 
+	#
+	# Parse lyric data
+	#
 	print "Parsing lyrics..."
-	for songPage in songPages:
-		addSongToLyricDict(songPage, lyricDict, artistName)
+	fmtSongs = []
+	formatLyricData(songPages, fmtSongs)
+
+	#
+	# Add songs to lyric dictionary
+	#
+	for song in fmtSongs:
+		addSongToLyricDict(song, lyricDict, artistName)
 
 	print "Organizing Lyric Dictionary..."
 	removeDuplicateEntries(lyricDict)
 
+	#
+	# Output lyric data
+	#
 	done = False
 	while not done:
 		prompt = """\nChoose an option:
