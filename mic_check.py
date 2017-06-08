@@ -22,7 +22,7 @@ def formatLyricData(unfmtLyrics, fmtLyrics):
 		# deal with characters that the charmap can't handle
 		l = l.replace(u"\u2019", "").replace(u"\u201c", "").replace(u"\u201d", "").replace(u"\u2018", "")
 		l = l.replace("\n", " ").replace("\r", " ").replace("\t", " ")
-		l = l.replace("!", "").replace(",", "").replace(")", "").replace("(", "").replace(";", "").replace("*", "").replace("?", "").replace(".", "").replace("\"", "")
+		l = l.replace("!", "").replace(",", "").replace(")", "").replace("(", "").replace(";", "").replace("*", "").replace("?", "").replace(".", "").replace("\"", "").replace("+", "")
 
 		fmtLyrics.append(l)
 
