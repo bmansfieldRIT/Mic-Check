@@ -8,7 +8,7 @@ from collections import Counter
 from bs4 import BeautifulSoup
 
 
-
+# TODO remove structural tags (x2, 2x, chorus, etc)
 # removes characters from a set of lyrics before parsing
 # Input: BeautifulSoup <p> object array
 # Output: String Array
@@ -22,8 +22,8 @@ def formatLyricData(unfmtLyrics, fmtLyrics):
 		# deal with characters that the charmap can't handle
 		l = l.replace(u"\u2019", "").replace(u"\u201c", "").replace(u"\u201d", "").replace(u"\u2018", "")
 		l = l.replace("\n", " ").replace("\r", " ").replace("\t", " ")
-		l = l.replace("!", "").replace(",", "").replace(")", "").replace("(", "").replace(";", "").replace("*", "").replace("?", "").replace(".", "").replace("\"", "").replace("+", "")
-
+		l = l.replace("!", "").replace(",", "").replace(")", "").replace("(", "").replace(";", "").replace("*", "").replace("?", "").replace("\"", "").replace("+", "")
+		l = l.replace("+", "")
 		fmtLyrics.append(l)
 
 	return fmtLyrics
@@ -36,18 +36,24 @@ def getPrefixShorteningReplacements():
 
 # creates a dictionary to replace common suffix shortenings
 def getSuffixShorteningReplacements():
-    return { "abusin'":"abusing", "actin'":"acting", "addin'":"adding" }
+    return { "abusin\'":"abusing", "actin'":"acting", "addin'":"adding" }
 
 
 # creates a dictionary to replace common misspellings
 def getMisspellingsReplacements():
-    return { "basterd'":"bastard", "beatz'":"beats", "becouse'":"because" }
+    return { "basterd":"bastard", "beatz":"beats", "becouse":"because" }
 
 
 # creates a dictionary to replace common hyphenation errors
 def getHyphenationsReplacements():
     return { "bar-code":"barcode", "break-fast":"breakfast", "car-pooling":"carpooling" }
 
+
+def addWord(lyricDict, word):
+	if word not in lyricDict:
+		lyricDict[word] = 1
+	else:
+		lyricDict[word] += 1
 
 # note: lyrics sometimes contain tags such as [verse 1: Brian Eno]
 # 	to indicate who the lyrics belong to. In this case, the function will
@@ -61,7 +67,10 @@ def addSongToLyricDict(lyrics, lyricDict, artistName):
 	collectingTagInfo = False
 	checkTagAgainstArtist = False
 
-	replacewordsDict = getPrefixShorteningReplacements()
+	misspellReplace = getMisspellingsReplacements()
+	hyphReplace = getHyphenationsReplacements()
+	preReplace = getPrefixShorteningReplacements()
+	suffReplace = getSuffixShorteningReplacements()
 
 	tagInfo = "" # construct a string representing the tag of a lyric block
 
@@ -93,16 +102,19 @@ def addSongToLyricDict(lyrics, lyricDict, artistName):
 					tagInfo += " " + lyric
 				else:
 					if acceptLyrics:
-						if lyric in replacewordsDict:
-							if replacewordsDict[lyric] not in lyricDict:
-								lyricDict[replacewordsDict[lyric]] = 1
-							else:
-								lyricDict[replacewordsDict[lyric]] += 1
+
+						# apply the replacement filter dictionaries
+						if lyric in hyphReplace:
+							addWord(lyricDict, hyphReplace[lyric])
+						elif lyric in misspellReplace:
+							addWord(lyricDict, misspellReplace[lyric])
+						elif lyric in preReplace:
+							addWord(lyricDict, preReplace[lyric])
+						elif lyric in suffReplace:
+							addWord(lyricDict, suffReplace[lyric])
 						else:
-							if lyric not in lyricDict:
-								lyricDict[lyric] = 1
-							else:
-								lyricDict[lyric] += 1
+							addWord(lyricDict, lyric)
+
 
 def removeDuplicateEntries(lyricDict):
 	lyricsMarkedForDeletion = [] # lyrics cannot be deleted in the for loop, so we delete them afterwards
